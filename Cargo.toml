@@ -9,7 +9,6 @@ members = [
     #    "sqlx-bench",
     "sqlx-mysql",
     "sqlx-postgres",
-    "sqlx-sqlite",
     "examples/mysql/todos",
     "examples/postgres/axum-social-with-tests",
     "examples/postgres/chat",
@@ -19,7 +18,6 @@ members = [
     "examples/postgres/todos",
     "examples/postgres/mockable-todos",
     "examples/postgres/transaction",
-    "examples/sqlite/todos",
 ]
 
 [workspace.package]
@@ -27,7 +25,7 @@ version = "0.7.4"
 license = "MIT OR Apache-2.0"
 edition = "2021"
 repository = "https://github.com/launchbadge/sqlx"
-keywords = ["database", "async", "postgres", "mysql", "sqlite"]
+keywords = ["database", "async", "postgres", "mysql"]
 categories = ["database", "asynchronous"]
 authors = [
     "Ryan Leckey <leckey.ryan@gmail.com>",
@@ -54,10 +52,10 @@ rustdoc-args = ["--cfg", "docsrs"]
 [features]
 default = ["any", "macros", "migrate", "json"]
 macros = ["sqlx-macros"]
-migrate = ["sqlx-core/migrate", "sqlx-macros?/migrate", "sqlx-mysql?/migrate", "sqlx-postgres?/migrate", "sqlx-sqlite?/migrate"]
+migrate = ["sqlx-core/migrate", "sqlx-macros?/migrate", "sqlx-mysql?/migrate", "sqlx-postgres?/migrate"]
 
 # intended mainly for CI and docs
-all-databases = ["mysql", "sqlite", "postgres", "any"]
+all-databases = ["mysql", "postgres", "any"]
 _unstable-all-types = [
     "bigdecimal",
     "rust_decimal",
@@ -94,23 +92,23 @@ _rt-async-std = []
 _rt-tokio = []
 
 # database
-any = ["sqlx-core/any", "sqlx-mysql?/any", "sqlx-postgres?/any", "sqlx-sqlite?/any"]
+any = ["sqlx-core/any", "sqlx-mysql?/any", "sqlx-postgres?/any"]
 postgres = ["sqlx-postgres", "sqlx-macros?/postgres"]
 mysql = ["sqlx-mysql", "sqlx-macros?/mysql"]
-sqlite = ["sqlx-sqlite", "sqlx-macros?/sqlite"]
+sqlite = []
 
 # types
-json = ["sqlx-macros?/json", "sqlx-mysql?/json", "sqlx-postgres?/json", "sqlx-sqlite?/json"]
+json = ["sqlx-macros?/json", "sqlx-mysql?/json", "sqlx-postgres?/json"]
 
 bigdecimal = ["sqlx-core/bigdecimal", "sqlx-macros?/bigdecimal", "sqlx-mysql?/bigdecimal", "sqlx-postgres?/bigdecimal"]
 bit-vec = ["sqlx-core/bit-vec", "sqlx-macros?/bit-vec", "sqlx-postgres?/bit-vec"]
-chrono = ["sqlx-core/chrono", "sqlx-macros?/chrono", "sqlx-mysql?/chrono", "sqlx-postgres?/chrono", "sqlx-sqlite?/chrono"]
+chrono = ["sqlx-core/chrono", "sqlx-macros?/chrono", "sqlx-mysql?/chrono", "sqlx-postgres?/chrono"]
 ipnetwork = ["sqlx-core/ipnetwork", "sqlx-macros?/ipnetwork", "sqlx-postgres?/ipnetwork"]
 mac_address = ["sqlx-core/mac_address", "sqlx-macros?/mac_address", "sqlx-postgres?/mac_address"]
 rust_decimal = ["sqlx-core/rust_decimal", "sqlx-macros?/rust_decimal", "sqlx-mysql?/rust_decimal", "sqlx-postgres?/rust_decimal"]
-time = ["sqlx-core/time", "sqlx-macros?/time", "sqlx-mysql?/time", "sqlx-postgres?/time", "sqlx-sqlite?/time"]
-uuid = ["sqlx-core/uuid", "sqlx-macros?/uuid", "sqlx-mysql?/uuid", "sqlx-postgres?/uuid", "sqlx-sqlite?/uuid"]
-regexp = ["sqlx-sqlite?/regexp"]
+time = ["sqlx-core/time", "sqlx-macros?/time", "sqlx-mysql?/time", "sqlx-postgres?/time"]
+uuid = ["sqlx-core/uuid", "sqlx-macros?/uuid", "sqlx-mysql?/uuid", "sqlx-postgres?/uuid"]
+regexp = []
 
 [workspace.dependencies]
 # Core Crates
@@ -121,7 +119,6 @@ sqlx-macros = { version = "=0.7.4", path = "sqlx-macros" }
 # Driver crates
 sqlx-mysql = { version = "=0.7.4", path = "sqlx-mysql" }
 sqlx-postgres = { version = "=0.7.4", path = "sqlx-postgres" }
-sqlx-sqlite = { version = "=0.7.4", path = "sqlx-sqlite" }
 
 # Facade crate (for reference from sqlx-cli)
 sqlx = { version = "=0.7.4", path = ".", default-features = false }
@@ -155,7 +152,6 @@ sqlx-macros = { workspace = true, optional = true }
 
 sqlx-mysql = { workspace = true, optional = true }
 sqlx-postgres = { workspace = true, optional = true }
-sqlx-sqlite = { workspace = true, optional = true }
 
 [dev-dependencies]
 anyhow = "1.0.52"
@@ -176,12 +172,6 @@ rand_xoshiro = "0.6.0"
 hex = "0.4.3"
 tempfile = "3.9.0"
 criterion = { version = "0.5.1", features = ["async_tokio"] }
-
-# If this is an unconditional dev-dependency then Cargo will *always* try to build `libsqlite3-sys`,
-# even when SQLite isn't the intended test target, and fail if the build environment is not set up for compiling C code.
-[target.'cfg(sqlite_test_sqlcipher)'.dev-dependencies]
-# Enable testing with SQLCipher if specifically requested.
-libsqlite3-sys = { version = "0.27", features = ["bundled-sqlcipher"] }
 
 #
 # Any
@@ -205,66 +195,6 @@ required-features = ["any"]
 name = "migrate-macro"
 path = "tests/migrate/macro.rs"
 required-features = ["macros", "migrate"]
-
-#
-# SQLite
-#
-
-[[test]]
-name = "sqlite"
-path = "tests/sqlite/sqlite.rs"
-required-features = ["sqlite"]
-
-[[test]]
-name = "sqlite-any"
-path = "tests/sqlite/any.rs"
-required-features = ["sqlite"]
-
-[[test]]
-name = "sqlite-types"
-path = "tests/sqlite/types.rs"
-required-features = ["sqlite"]
-
-[[test]]
-name = "sqlite-describe"
-path = "tests/sqlite/describe.rs"
-required-features = ["sqlite"]
-
-[[test]]
-name = "sqlite-macros"
-path = "tests/sqlite/macros.rs"
-required-features = ["sqlite", "macros"]
-
-[[test]]
-name = "sqlite-derives"
-path = "tests/sqlite/derives.rs"
-required-features = ["sqlite", "macros"]
-
-[[test]]
-name = "sqlite-error"
-path = "tests/sqlite/error.rs"
-required-features = ["sqlite"]
-
-[[test]]
-name = "sqlite-sqlcipher"
-path = "tests/sqlite/sqlcipher.rs"
-required-features = ["sqlite"]
-
-[[test]]
-name = "sqlite-test-attr"
-path = "tests/sqlite/test-attr.rs"
-required-features = ["sqlite", "macros", "migrate"]
-
-[[test]]
-name = "sqlite-migrate"
-path = "tests/sqlite/migrate.rs"
-required-features = ["sqlite", "macros", "migrate"]
-
-[[bench]]
-name = "sqlite-describe"
-path = "benches/sqlite/describe.rs"
-harness = false
-required-features = ["sqlite"]
 
 #
 # MySQL
