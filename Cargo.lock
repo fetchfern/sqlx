@@ -1313,17 +1313,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "flume"
-version = "0.11.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "da0e4dd2a88388a1f4ccc7c9ce104604dab68d9f408dc34cd45823d5a9069095"
-dependencies = [
- "futures-core",
- "futures-sink",
- "spin",
-]
-
-[[package]]
 name = "fnv"
 version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2079,18 +2068,6 @@ dependencies = [
  "bitflags 2.7.0",
  "libc",
  "redox_syscall",
-]
-
-[[package]]
-name = "libsqlite3-sys"
-version = "0.30.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2e99fb7a497b1e3339bc746195567ed8d3e24945ecd636e3619d20b9de9e9149"
-dependencies = [
- "bindgen",
- "cc",
- "pkg-config",
- "vcpkg",
 ]
 
 [[package]]
@@ -3378,9 +3355,6 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
-dependencies = [
- "lock_api",
-]
 
 [[package]]
 name = "spki"
@@ -3403,7 +3377,6 @@ dependencies = [
  "env_logger",
  "futures",
  "hex",
- "libsqlite3-sys",
  "paste",
  "rand",
  "rand_xoshiro",
@@ -3413,7 +3386,6 @@ dependencies = [
  "sqlx-macros",
  "sqlx-mysql",
  "sqlx-postgres",
- "sqlx-sqlite",
  "sqlx-test",
  "tempfile",
  "time",
@@ -3606,17 +3578,6 @@ dependencies = [
 name = "sqlx-example-postgres-transaction"
 version = "0.1.0"
 dependencies = [
- "futures",
- "sqlx",
- "tokio",
-]
-
-[[package]]
-name = "sqlx-example-sqlite-todos"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "clap",
  "futures",
  "sqlx",
  "tokio",
