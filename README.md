@@ -1,3 +1,10 @@
+This is a simple fork of SQLx v0.8.6 with minor modifications:
+
+-   Removed `sqlite` backend for sibling compatibility with alternative versions of the libsqlite3-sys crate.
+-   Pass an `Instant` (acquire_started_at) to the `before_acquire` callback.
+
+<br />
+
 <h1 align="center">SQLx</h1>
 <div align="center">
  <strong>
@@ -43,7 +50,7 @@
     <span> | </span>
     <a href="https://github.com/launchbadge/sqlx/wiki/Ecosystem">
       Ecosystem
-    </a>    
+    </a>
     <span> | </span>
     <a href="https://discord.gg/uuruzJ7">
       Discord
@@ -72,6 +79,7 @@ SQLx is an async, pure Rust<sub>†</sub> SQL crate featuring compile-time check
 -   **Compile-time checked queries** (if you want). See [SQLx is not an ORM](#sqlx-is-not-an-orm).
 
 -   **Database Agnostic**. Support for [PostgreSQL], [MySQL], [MariaDB], [SQLite].
+
     -   [MSSQL] was supported prior to version 0.7, but has been removed pending a full rewrite of the driver as part of our [SQLx Pro initiative].
 
 -   **Pure Rust**. The Postgres and MySQL/MariaDB drivers are written in pure Rust using **zero** unsafe<sub>††</sub> code.
@@ -175,9 +183,9 @@ be removed in the future.
 
 -   `runtime-tokio-rustls`: Use the `tokio` runtime and `rustls` TLS backend (SOFT-DEPRECATED).
 
-    - Actix-web is fully compatible with Tokio and so a separate runtime feature is no longer needed.
+    -   Actix-web is fully compatible with Tokio and so a separate runtime feature is no longer needed.
 
--   `tls-native-tls`: Use the `native-tls` TLS backend (OpenSSL on *nix, SChannel on Windows, Secure Transport on macOS).
+-   `tls-native-tls`: Use the `native-tls` TLS backend (OpenSSL on \*nix, SChannel on Windows, Secure Transport on macOS).
 
 -   `tls-rustls`: Use the `rustls` TLS backend (cross-platform backend, only supports TLS 1.2 and 1.3).
 
@@ -190,15 +198,17 @@ be removed in the future.
 -   `sqlite`: Add support for the self-contained [SQLite](https://sqlite.org/) database engine with SQLite bundled and statically-linked.
 
 -   `sqlite-unbundled`: The same as above (`sqlite`), but link SQLite from the system instead of the bundled version.
-    * Allows updating SQLite independently of SQLx or using forked versions.
-    * You must have SQLite installed on the system or provide a path to the library at build time.
-       See [the `rusqlite` README](https://github.com/rusqlite/rusqlite?tab=readme-ov-file#notes-on-building-rusqlite-and-libsqlite3-sys) for details.
-    * May result in link errors if the SQLite version is too old. Version `3.20.0` or newer is recommended.
-    * Can increase build time due to the use of bindgen.
+
+    -   Allows updating SQLite independently of SQLx or using forked versions.
+    -   You must have SQLite installed on the system or provide a path to the library at build time.
+        See [the `rusqlite` README](https://github.com/rusqlite/rusqlite?tab=readme-ov-file#notes-on-building-rusqlite-and-libsqlite3-sys) for details.
+    -   May result in link errors if the SQLite version is too old. Version `3.20.0` or newer is recommended.
+    -   Can increase build time due to the use of bindgen.
 
 -   `sqlite-preupdate-hook`: enables SQLite's [preupdate hook](https://sqlite.org/c3ref/preupdate_count.html) API.
-    * Exposed as a separate feature because it's generally not enabled by default.
-    * Using this feature with `sqlite-unbundled` may cause linker failures if the system SQLite version does not support it.
+
+    -   Exposed as a separate feature because it's generally not enabled by default.
+    -   Using this feature with `sqlite-unbundled` may cause linker failures if the system SQLite version does not support it.
 
 -   `any`: Add support for the `Any` database driver, which can proxy to a database driver at runtime.
 
@@ -238,15 +248,16 @@ regular SQL as input and ensure that it is valid for your database. The way this
 SQLx connects to your development DB at compile time to have the database itself verify (and return
 some info on) your SQL queries. This has some potentially surprising implications:
 
-- Since SQLx never has to parse the SQL string itself, any syntax that the development DB accepts
-  can be used (including things added by database extensions)
-- Due to the different amount of information databases let you retrieve about queries, the extent of
-  SQL verification you get from the query macros depends on the database
+-   Since SQLx never has to parse the SQL string itself, any syntax that the development DB accepts
+    can be used (including things added by database extensions)
+-   Due to the different amount of information databases let you retrieve about queries, the extent of
+    SQL verification you get from the query macros depends on the database
 
 **If you are looking for an (asynchronous) ORM,** you can check out our new [Ecosystem wiki page](https://github.com/launchbadge/sqlx/wiki/Ecosystem#orms)!
 
 [`ormx`]: https://crates.io/crates/ormx
 [`SeaORM`]: https://github.com/SeaQL/sea-orm
+
 ## Usage
 
 See the `examples/` folder for more in-depth usage.
@@ -280,7 +291,6 @@ async fn main() -> Result<(), sqlx::Error> {
     Ok(())
 }
 ```
-
 
 ### Connecting
 
