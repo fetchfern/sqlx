@@ -7,23 +7,14 @@ publish = false
 
 [features]
 runtime-actix-native-tls = ["runtime-tokio-native-tls"]
-runtime-async-std-native-tls = [
-    "sqlx/runtime-async-std-native-tls",
-]
-runtime-tokio-native-tls = [
-    "sqlx/runtime-tokio-native-tls",
-]
+runtime-async-std-native-tls = ["sqlx/runtime-async-std-native-tls"]
+runtime-tokio-native-tls = ["sqlx/runtime-tokio-native-tls"]
 
 runtime-actix-rustls = ["runtime-tokio-rustls"]
-runtime-async-std-rustls = [
-    "sqlx/runtime-async-std-rustls",
-]
-runtime-tokio-rustls = [
-    "sqlx/runtime-tokio-rustls",
-]
+runtime-async-std-rustls = ["sqlx/runtime-async-std-rustls"]
+runtime-tokio-rustls = ["sqlx/runtime-tokio-rustls"]
 
 postgres = ["sqlx/postgres"]
-sqlite = ["sqlx/sqlite"]
 
 [dependencies]
 criterion = "0.5.1"
