@@ -259,7 +259,7 @@ impl<DB: Database> PoolInner<DB> {
                     let guard = match self.pop_idle(permit) {
 
                         // Then, check that we can use it...
-                        Ok(conn) => match check_idle_conn(conn, &self.options).await {
+                        Ok(conn) => match check_idle_conn(conn, &self.options, acquire_started_at).await {
 
                             // All good!
                             Ok(live) => return Ok(live),
@@ -465,6 +465,7 @@ fn is_beyond_idle_timeout<DB: Database>(idle: &Idle<DB>, options: &PoolOptions<D
 async fn check_idle_conn<DB: Database>(
     mut conn: Floating<DB, Idle<DB>>,
     options: &PoolOptions<DB>,
+    acquire_started_at: Instant,
 ) -> Result<Floating<DB, Live<DB>>, DecrementSizeGuard<DB>> {
     if options.test_before_acquire {
         // Check that the connection is still live
@@ -480,7 +481,7 @@ async fn check_idle_conn<DB: Database>(
 
     if let Some(test) = &options.before_acquire {
         let meta = conn.metadata();
-        match test(&mut conn.live.raw, meta).await {
+        match test(&mut conn.live.raw, meta, acquire_started_at).await {
             Ok(false) => {
                 // connection was rejected by user-defined hook, close nicely
                 return Err(conn.close().await);

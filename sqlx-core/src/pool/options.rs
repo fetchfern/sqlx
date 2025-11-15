@@ -57,6 +57,7 @@ pub struct PoolOptions<DB: Database> {
             dyn Fn(
                     &mut DB::Connection,
                     PoolConnectionMetadata,
+                    Instant,
                 ) -> BoxFuture<'_, Result<bool, Error>>
                 + 'static
                 + Send
@@ -434,7 +435,11 @@ impl<DB: Database> PoolOptions<DB> {
     /// For a discussion on why `Box::pin()` is required, see [the type-level docs][Self].
     pub fn before_acquire<F>(mut self, callback: F) -> Self
     where
-        for<'c> F: Fn(&'c mut DB::Connection, PoolConnectionMetadata) -> BoxFuture<'c, Result<bool, Error>>
+        for<'c> F: Fn(
+                &'c mut DB::Connection,
+                PoolConnectionMetadata,
+                Instant,
+            ) -> BoxFuture<'c, Result<bool, Error>>
             + 'static
             + Send
             + Sync,
