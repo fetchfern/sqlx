@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::decode::Decode;
 use crate::encode::{Encode, IsNull};
 use crate::error::BoxDynError;
@@ -25,6 +27,16 @@ impl PgHasArrayType for Box<[u8]> {
 impl PgHasArrayType for Vec<u8> {
     fn array_type_info() -> PgTypeInfo {
         <[&[u8]] as Type<Postgres>>::type_info()
+    }
+}
+
+impl PgHasArrayType for Cow<'_, [u8]> {
+    fn array_type_info() -> PgTypeInfo {
+        <[&[u8]] as Type<Postgres>>::type_info()
+    }
+
+    fn array_compatible(ty: &PgTypeInfo) -> bool {
+        <&[u8] as PgHasArrayType>::array_compatible(ty)
     }
 }
 
