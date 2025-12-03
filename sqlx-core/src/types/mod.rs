@@ -17,6 +17,8 @@
 //! To represent nullable SQL types, `Option<T>` is supported where `T` implements `Type`.
 //! An `Option<T>` represents a potentially `NULL` value from SQL.
 
+use std::borrow::Cow;
+
 use crate::database::Database;
 use crate::type_info::TypeInfo;
 
@@ -249,5 +251,19 @@ impl<T: Type<DB>, DB: Database> Type<DB> for Option<T> {
 
     fn compatible(ty: &DB::TypeInfo) -> bool {
         ty.is_null() || <T as Type<DB>>::compatible(ty)
+    }
+}
+
+impl<T, DB: Database> Type<DB> for Cow<'_, T>
+where
+    // `ToOwned` is required here to satisfy `Cow`
+    T: Type<DB> + ToOwned + ?Sized,
+{
+    fn type_info() -> DB::TypeInfo {
+        <T as Type<DB>>::type_info()
+    }
+
+    fn compatible(ty: &DB::TypeInfo) -> bool {
+        <T as Type<DB>>::compatible(ty)
     }
 }
