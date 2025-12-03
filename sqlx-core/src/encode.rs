@@ -130,10 +130,11 @@ macro_rules! impl_encode_for_option {
         }
     };
 }
-impl<'q, T, DB: Database> Encode<'q, DB> for Cow<'q, T>
+
+impl<'q, 'e, T, DB: Database> Encode<'q, DB> for Cow<'q, T>
 where
-    T: Encode<'q, DB>,
-    T: ToOwned,
+    for<'t> &'t T: Encode<'q, DB>,
+    T: ToOwned + ?Sized,
 {
     #[inline]
     fn encode(self, buf: &mut <DB as Database>::ArgumentBuffer<'q>) -> Result<IsNull, BoxDynError> {
