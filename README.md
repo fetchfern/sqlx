@@ -2,6 +2,7 @@ This is a simple fork of SQLx v0.8.6 with minor modifications:
 
 -   Removed `sqlite` backend for sibling compatibility with alternative versions of the libsqlite3-sys crate.
 -   Pass an `Instant` (acquire_started_at) to the `before_acquire` callback.
+-   Backported `impl Encode/Decode/Type for Cow<'_, T>` from main
 
 <br />
 
