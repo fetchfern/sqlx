@@ -21,7 +21,7 @@ use crate::private_tracing_dynamic_event;
 use futures_util::future::{self};
 use futures_util::FutureExt;
 use std::time::{Duration, Instant};
-use tracing::Level;
+use tracing::{instrument, Level};
 
 pub(crate) struct PoolInner<DB: Database> {
     pub(super) connect_options: RwLock<Arc<<DB::Connection as Connection>::Options>>,
@@ -124,6 +124,7 @@ impl<DB: Database> PoolInner<DB> {
     ///
     /// If we steal a permit from the parent but *don't* open a connection,
     /// it should be returned to the parent.
+    #[instrument(name = "sqlx::pool::internal::acquire_permit", skip_all)]
     async fn acquire_permit<'a>(self: &'a Arc<Self>) -> Result<AsyncSemaphoreReleaser<'a>, Error> {
         let parent = self
             .parent()
@@ -239,6 +240,11 @@ impl<DB: Database> PoolInner<DB> {
         }
     }
 
+    #[instrument(name = "sqlx::pool::internal::acquire", skip_all, fields(
+        options.acquire_timeout = self.options.acquire_timeout.as_secs_f64(),
+        options.min_connections = self.options.min_connections,
+        options.max_connections = self.options.max_connections,
+    ))]
     pub(super) async fn acquire(self: &Arc<Self>) -> Result<Floating<DB, Live<DB>>, Error> {
         if self.is_closed() {
             return Err(Error::PoolClosed);
@@ -318,6 +324,7 @@ impl<DB: Database> PoolInner<DB> {
         Ok(acquired)
     }
 
+    #[instrument(name = "sqlx::pool::internal::connect", skip_all)]
     pub(super) async fn connect(
         self: &Arc<Self>,
         deadline: Instant,
