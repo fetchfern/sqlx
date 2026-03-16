@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use either::Either;
 use futures_core::stream::BoxStream;
 use futures_util::{future, StreamExt, TryFutureExt, TryStreamExt};
+use tracing::{info_span, Instrument};
 
 use crate::arguments::{Arguments, IntoArguments};
 use crate::database::{Database, HasStatementCache};
@@ -404,7 +405,9 @@ where
         F: 'e,
         O: 'e,
     {
-        Box::pin(try_stream! {
+        let span = info_span!("fetch", sql = self.sql());
+
+        Box::pin(try_stream!(span: span, {
             let mut s = executor.fetch_many(self.inner);
 
             while let Some(v) = s.try_next().await? {
@@ -417,7 +420,7 @@ where
             }
 
             Ok(())
-        })
+        }))
     }
 
     /// Execute the query and return all the resulting rows collected into a [`Vec`].
