@@ -283,7 +283,7 @@ impl<DB: Database> Pool<DB> {
     /// For production applications, you'll likely want to make at least few tweaks.
     ///
     /// See [`PoolOptions::new()`] for details.
-    #[instrument(name = "sqlx::pool::connect", skip_all)]
+    #[instrument(name = "connect", skip_all)]
     pub async fn connect(url: &str) -> Result<Self, Error> {
         PoolOptions::<DB>::new().connect(url).await
     }
@@ -295,7 +295,7 @@ impl<DB: Database> Pool<DB> {
     /// For production applications, you'll likely want to make at least few tweaks.
     ///
     /// See [`PoolOptions::new()`] for details.
-    #[instrument(name = "sqlx::pool::connect_with", skip_all)]
+    #[instrument(name = "connect_with", skip_all)]
     pub async fn connect_with(
         options: <DB::Connection as Connection>::Options,
     ) -> Result<Self, Error> {
@@ -358,7 +358,7 @@ impl<DB: Database> Pool<DB> {
     ///
     /// This should eliminate any potential `.await` points between acquiring a connection and
     /// returning it.
-    #[instrument(name = "sqlx::pool::acquire", skip_all)]
+    #[instrument(name = "acquire", skip_all)]
     pub fn acquire(&self) -> impl Future<Output = Result<PoolConnection<DB>, Error>> + 'static {
         let shared = self.0.clone();
         async move { shared.acquire().await.map(|conn| conn.reattach()) }
@@ -368,13 +368,13 @@ impl<DB: Database> Pool<DB> {
     ///
     /// Returns `None` immediately if there are no idle connections available in the pool
     /// or there are tasks waiting for a connection which have yet to wake.
-    #[instrument(name = "sqlx::pool::try_acquire", skip_all)]
+    #[instrument(name = "try_acquire", skip_all)]
     pub fn try_acquire(&self) -> Option<PoolConnection<DB>> {
         self.0.try_acquire().map(|conn| conn.into_live().reattach())
     }
 
     /// Retrieves a connection and immediately begins a new transaction.
-    #[instrument(name = "sqlx::pool::begin", skip_all)]
+    #[instrument(name = "begin", skip_all)]
     pub async fn begin(&self) -> Result<Transaction<'static, DB>, Error> {
         Transaction::begin(
             MaybePoolConnection::PoolConnection(self.acquire().await?),
@@ -384,7 +384,7 @@ impl<DB: Database> Pool<DB> {
     }
 
     /// Attempts to retrieve a connection and immediately begins a new transaction if successful.
-    #[instrument(name = "sqlx::pool::try_begin", skip_all)]
+    #[instrument(name = "try_begin", skip_all)]
     pub async fn try_begin(&self) -> Result<Option<Transaction<'static, DB>>, Error> {
         match self.try_acquire() {
             Some(conn) => Transaction::begin(MaybePoolConnection::PoolConnection(conn), None)
